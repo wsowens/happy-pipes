@@ -1,29 +1,43 @@
 #include <SDL2/SDL.h>
 #include <vector>
+#include <stdlib.h>
+#include <ctime>
 
 #ifndef PIPE_H
 #define PIPE_H
 
-enum Direction{DOWN, UP, RIGHT, LEFT, SIZE};
+enum {DOWN, UP, RIGHT, LEFT, SIZE};
 
 class Pipe
 {
+    struct Line
+    {
+        int x1, y1, x2, y2;
+    };
+
 private:
-    int width = 4;
-    int currentPos;
-    int increment = 4;
+    SDL_Rect boundingBox = {0, 0, 900, 1200};
     SDL_Color primary;
+    int width = 4;
+    int increment = 4;
     int currentDirect;
-    std::vector<int> directions;
+    SDL_Point currentPos;
+    std::vector<SDL_Point> positions;
+    bool stop = false;
+    std::vector<Line> lineStack;
+    void wraparound();
 public:
-    Pipe(Direction direct = DOWN, SDL_Color color = {0xFF, 0, 0}, int pos = 100);
+    Pipe(int direct = DOWN, SDL_Color color = {0xFF, 0, 0}, SDL_Point position = {100, 100});
     void grow();
     void change_direction(int direct);
+
+    //accessor methods
     int get_width();
-    int get_position();
-    int get_increment();
     SDL_Color get_color();
-    std::vector<int> get_directions();
+    std::vector<SDL_Point> get_positions();
+    Line peek_line();
+    int get_position_count();
+
 };
 
 #endif

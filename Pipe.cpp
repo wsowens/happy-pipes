@@ -1,17 +1,81 @@
 #include "Pipe.h"
-#include <iostream>
 
-Pipe::Pipe(Direction direct, SDL_Color color, int pos)
+
+bool contains(SDL_Rect rect, SDL_Point point)
 {
-    primary = color;
+    return (point.x >= rect.x && point.x <= rect.w) && (point.y >= rect.y && point.y <= rect.h);
+}
+
+Pipe::Pipe(int direct, SDL_Color color, SDL_Point position)
+{
+    int red = rand() % 0xFF;
+    int green = rand() % 0xFF;
+    primary = {red, green, 0};
     currentDirect = direct;
-    currentPos = 100;
+    currentPos = position;
+}
+
+void Pipe::wraparound()
+{
+    switch (currentDirect)
+    {
+        case UP:
+            positions.push_back({currentPos.x, 0});
+            positions.push_back({-1,-1});
+            positions.push_back({currentPos.x, boundingBox.h});
+            currentPos.y = boundingBox.h + currentPos.y % boundingBox.h;
+            break;
+        case DOWN:
+            positions.push_back({currentPos.x, boundingBox.h});
+            positions.push_back({-1,-1});
+            positions.push_back({currentPos.x, 0});
+            currentPos.y = currentPos.y % boundingBox.h;
+            break;
+        case LEFT:
+            positions.push_back({0, currentPos.y});
+            positions.push_back({-1,-1});
+            positions.push_back({boundingBox.w, currentPos.y});
+            currentPos.x = boundingBox.w + currentPos.x % boundingBox.w;
+            break;
+        case RIGHT:
+            positions.push_back({boundingBox.w, currentPos.y});
+            positions.push_back({-1,-1});
+            positions.push_back({0, currentPos.y});
+            currentPos.x = currentPos.x % boundingBox.w;
+            break;
+    }
 }
 
 void Pipe::grow()
 {
-    directions.push_back(currentDirect);
-    //std::cerr << "growing pipe\n";
+    if (stop)
+        return;
+
+    if (!contains(boundingBox, currentPos))
+        wraparound();
+    positions.push_back(currentPos);
+
+    if (rand() % 10 == 0)
+        change_direction(rand());
+
+    int increment = rand();
+    switch (currentDirect)
+    {
+        case UP:
+            currentPos.y -= increment % (boundingBox.h / 25);
+            break;
+        case DOWN:
+            currentPos.y += increment % (boundingBox.h / 25);
+            break;
+        case LEFT:
+            currentPos.x -= increment % (boundingBox.w / 25);
+            break;
+        case RIGHT:
+            currentPos.x += increment % (boundingBox.w / 25);
+            break;
+    }
+
+
 }
 
 void Pipe::change_direction(int direct)
@@ -30,17 +94,17 @@ int Pipe::get_width()
     return width;
 }
 
-int Pipe::get_position()
+std::vector<SDL_Point> Pipe::get_positions()
 {
-    return currentPos;
+    return std::vector<SDL_Point>(positions);
 }
 
-int Pipe::get_increment()
+int Pipe::get_position_count()
 {
-    return increment;
+    return positions.size();
 }
 
-std::vector<int> Pipe::get_directions()
+Pipe::Line Pipe::peek_line()
 {
-    return std::vector<int>(directions);
+    return lineStack.back();
 }
