@@ -8,8 +8,8 @@
 #include "WindowWrapper.h"
 #include "Pipe.h"
 
-#define SCREEN_WIDTH 900
-#define SCREEN_HEIGHT 1200
+#define SCREEN_WIDTH 600
+#define SCREEN_HEIGHT 800
 
 
 WindowWrapper init()
@@ -258,7 +258,7 @@ int main(int argc, char** args)
     WindowWrapper mainWindow = init();
     SDL_Renderer * mainRenderer = mainWindow.getRenderer();
 
-    render_background(mainRenderer, {0, 0, 0});
+    render_background(mainRenderer, {10, 8, 17});
 
     /*
     for (int i = 0; i < 100; i++)

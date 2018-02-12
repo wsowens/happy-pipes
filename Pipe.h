@@ -17,26 +17,29 @@ class Pipe
 
 private:
     SDL_Rect boundingBox = {0, 0, 900, 1200};
-    SDL_Color primary;
-    int width = 4;
-    int increment = 4;
-    int currentDirect;
+	std::vector<SDL_Point> positions;
     SDL_Point currentPos;
-    std::vector<SDL_Point> positions;
-    bool stop = false;
+	//keeps tract of all lines
     std::vector<Line> lineStack;
+    SDL_Color primary;
+    int currentDirect;
+
+    int width = 4;
+    bool stop = false;
     void wraparound();
 public:
     Pipe(int direct = DOWN, SDL_Color color = {0xFF, 0, 0}, SDL_Point position = {100, 100});
-    void grow();
+
+	//change behavior
+	void grow();
     void change_direction(int direct);
 
     //accessor methods
     int get_width();
     SDL_Color get_color();
     std::vector<SDL_Point> get_positions();
-    Line peek_line();
     int get_position_count();
+    Line peek_line();
 
 };
 
